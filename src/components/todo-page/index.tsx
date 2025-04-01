@@ -7,6 +7,8 @@ import { FilterTodos } from "../../@types/enums";
 import Dropdown from "react-dropdown";
 import "react-dropdown/style.css";
 import { useTheme } from "../../context/ThemeContext";
+import { Modal } from "../modal";
+
 const options = [
   FilterTodos.all,
   FilterTodos.completed,
@@ -71,31 +73,45 @@ export const TodoPage = () => {
     setTodos(tasksNotDeleted);
   };
 
+  const resetCache = () => {
+    localStorage.removeItem("todosList");
+    window.location.reload();
+  };
+
   return (
     <div className="flex flex-col gap-24">
       <div className="w-full flex justify-end">
         <ThemeToggle />
       </div>
+      {todosFiltered?.length === 0 && (
+        <h1 className="text-white">There's no todos. Click reset cache</h1>
+      )}
+
+      <Modal />
 
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label
-            className={`${theme === "dark" ? "text-white" : "text-gray-900"}`}
-          >
-            Filter by status:
-          </label>
-          <Dropdown
-            options={options}
-            onChange={(e) => setFilter(e.value)}
-            className="myClassName"
-            controlClassName="p-2"
-            baseClassName={`${
-              theme === "dark"
-                ? "bg-purple-600 text-white"
-                : "bg-purple-300 text-gray-900"
-            } rounded-xl p-4`}
-          />
-        </div>
+        {todos && todos.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <label
+              className={`${theme === "dark" ? "text-white" : "text-gray-900"}`}
+            >
+              Filter by status:
+            </label>
+            <Dropdown
+              options={options}
+              onChange={(e) => setFilter(e.value)}
+              className="myClassName"
+              controlClassName="p-2 mb-2"
+              baseClassName={`${
+                theme === "dark"
+                  ? "bg-purple-600 text-white"
+                  : "bg-purple-300 text-gray-900"
+              } rounded-xl p-4`}
+              menuClassName="mb-2"
+            />
+          </div>
+        )}
+
         {todosFiltered?.map((todo) => {
           return (
             <TodoItem
@@ -107,6 +123,17 @@ export const TodoPage = () => {
           );
         })}
       </div>
+
+      <button
+        className={`p-2 rounded-md transition ${
+          theme === "dark"
+            ? "bg-purple-600 text-white"
+            : "bg-purple-300 text-gray-900"
+        } rounded-xl`}
+        onClick={resetCache}
+      >
+        Reset cache
+      </button>
     </div>
   );
 };
